@@ -522,7 +522,7 @@ body {
   <!-- ═══ HERO ═══ -->
   <header class="hero">
     <div class="hero-badge">Nintendo DS · Delta iOS · melonDS PC</div>
-    <div class="hero-logo">SVS<span>↔</span>SAV</div>
+    <div class="hero-logo">DELTA<span>↔</span>SAV</div>
     <p class="hero-tagline">Transfer DS game saves between Delta (iPhone) and melonDS (PC)</p>
     <p class="hero-sub">Free · Instant · No upload — everything runs in your browser</p>
   </header>
@@ -530,10 +530,10 @@ body {
   <!-- ═══ EXPLAINER ═══ -->
   <section class="explainer" aria-label="What this tool does">
     <strong>What does this do?</strong><br>
-    Delta on iOS saves your DS games as <span class="tag">.svs</span> savestate files — or as <span class="tag">UUID files</span> with no extension for regular in-game saves.
-    melonDS on PC uses plain <span class="tag pink">.sav</span> files.
-    These formats are incompatible — this tool converts between them instantly, with no data sent to any server.<br><br>
-    <strong>⚠️ Did Delta give you a file with no extension?</strong> That's normal — Delta stores all saves internally as UUID-named files (e.g. <code style="color:var(--cyan);background:rgba(0,229,255,0.08);padding:1px 5px;border-radius:2px">24BB0163-10B6-45CD-B0B5-010EE9994B72</code>). This tool accepts them directly — just drop them in the SVS slot.<br><br>
+    Delta on iOS and melonDS on PC use incompatible save formats. This tool converts between them instantly, with no data sent to any server.<br><br>
+    <strong>Delta gives you two types of files — and they work differently:</strong><br>
+    <strong>①</strong> <span class="tag">.svs</span> — exported via Delta's "Export Save State" function. Only useful for <strong>extraction</strong> (getting the .sav out). You cannot reimport a .svs back into Delta reliably.<br>
+    <strong>②</strong> <span class="tag">UUID file</span> (no extension, e.g. <code style="color:var(--cyan);background:rgba(0,229,255,0.08);padding:1px 5px;border-radius:2px">24BB0163-10B6-45CD-B0B5-010EE9994B72</code>) — Delta's internal save, found in <code style="color:var(--cyan);background:rgba(0,229,255,0.08);padding:1px 5px;border-radius:2px">Files app → Delta → Database → SaveStates</code>. This is what you need for the <strong>full round-trip</strong>: extract → edit → inject back → replace in folder.<br><br>
     <strong>Common use cases:</strong>
     <div class="use-cases">
       <div class="use-case">
@@ -558,10 +558,10 @@ body {
   <!-- ═══ TABS ═══ -->
   <div class="tabs" role="tablist">
     <button class="tab-btn active" id="tab-extract" role="tab" aria-selected="true" aria-controls="panel-extract">
-      SVS → SAV
+      DELTA → SAV
     </button>
     <button class="tab-btn" id="tab-inject" role="tab" aria-selected="false" aria-controls="panel-inject">
-      SAV → SVS
+      SAV → DELTA
     </button>
   </div>
 
@@ -573,13 +573,13 @@ body {
       <div class="drop-zone" id="dz-extract">
         <input type="file" id="input-extract" accept=".svs">
         <span class="drop-icon">◈</span>
-        <div class="drop-title">Drop your .svs file here</div>
-        <div class="drop-hint">Delta save state — <span class="ext">.svs</span> or any UUID file</div>
+        <div class="drop-title">Drop your Delta save file here</div>
+        <div class="drop-hint">Accepts <span class="ext">.svs</span> files and <span class="ext">UUID files</span> (no extension)</div>
         <div class="drop-filename" id="name-extract"></div>
       </div>
 
       <button class="btn btn-primary" id="btn-extract" disabled>
-        <span>⬇ EXTRACT .SAV FROM SAVESTATE</span>
+        <span>⬇ EXTRACT .SAV</span>
       </button>
 
       <div class="log" id="log-extract"><div class="log-lines" id="lines-extract"></div></div>
@@ -602,8 +602,8 @@ body {
         <div class="drop-zone" id="dz-svs">
           <input type="file" id="input-svs" accept=".svs">
           <span class="drop-icon">◈</span>
-          <div class="drop-title">Original .svs or UUID file</div>
-          <div class="drop-hint">Save state or internal save from <span class="ext">Delta</span></div>
+          <div class="drop-title">UUID file from Delta</div>
+          <div class="drop-hint">⚠️ Must be the <span class="ext">UUID file</span>, not a .svs</div>
           <div class="drop-filename" id="name-svs"></div>
         </div>
 
@@ -612,27 +612,30 @@ body {
         <div class="drop-zone" id="dz-sav">
           <input type="file" id="input-sav" accept=".sav">
           <span class="drop-icon">◇</span>
-          <div class="drop-title">Edited .sav</div>
+          <div class="drop-title">Updated .sav</div>
           <div class="drop-hint">From <span class="ext">melonDS</span> or PKHeX</div>
           <div class="drop-filename" id="name-sav"></div>
         </div>
       </div>
 
+      <div style="font-size:11px;color:var(--yellow);margin-bottom:14px;padding:10px 14px;border:1px solid rgba(255,214,0,0.2);border-radius:2px;background:rgba(255,214,0,0.04);line-height:1.7">
+        ⚠️ <strong>Use the UUID file, not the .svs.</strong> The .svs exported by Delta cannot be reliably reimported. The UUID file (found in <code style="color:var(--cyan)">Files app → Delta → Database → SaveStates</code>) is the one you can replace to get your save back into Delta.
+      </div>
+
       <button class="btn btn-primary" id="btn-inject" disabled>
-        <span>⚙ INJECT SAV INTO SAVESTATE</span>
+        <span>⚙ INJECT SAV INTO DELTA FILE</span>
       </button>
 
       <div class="log" id="log-inject"><div class="log-lines" id="lines-inject"></div></div>
       <div class="result" id="result-inject"></div>
-      <button class="btn btn-download" id="dl-inject">⬇ DOWNLOAD .SVS FOR DELTA</button>
+      <button class="btn btn-download" id="dl-inject">⬇ DOWNLOAD UPDATED DELTA FILE</button>
 
       <div class="instructions" id="instr-inject">
-        <strong>How to import back into Delta</strong>
-        Delta's built-in import function may not work reliably. The method that works:<br><br>
+        <strong>How to put it back in Delta</strong>
         1. Open the <strong>Files app</strong> on iOS<br>
         2. Navigate to <code>Delta → Database → SaveStates</code><br>
-        3. Find the original save file (UUID filename, no extension)<br>
-        4. Replace it with the downloaded file — keeping the <strong>exact same UUID filename</strong><br><br>
+        3. Find the original UUID file for your game<br>
+        4. Replace it with the downloaded file — keeping the <strong>exact same UUID filename</strong> (no extension)<br><br>
         The next time you load the game in Delta, it will use the updated save.
       </div>
     </div>
@@ -644,18 +647,18 @@ body {
     <div class="faq-title">// FAQ</div>
 
     <div class="faq-item">
-      <div class="faq-q">What is a .svs file?</div>
-      <div class="faq-a">A <code>.svs</code> file is a save state created by the Delta emulator on iOS for Nintendo DS games. It uses the melonDS save state format internally and contains a full snapshot of the game, including the SRAM save data.</div>
+      <div class="faq-q">What is a .svs file and when do I use it?</div>
+      <div class="faq-a">A <code>.svs</code> file is exported by Delta via "Export Save State". It's useful only for <strong>extraction</strong> — getting the <code>.sav</code> out to use in melonDS or PKHeX. You cannot reliably reimport a <code>.svs</code> back into Delta, so it only covers one direction.</div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-q">What are those files with no extension in Delta's folder (UUID files)?</div>
-      <div class="faq-a">Delta doesn't distinguish between save states and regular in-game saves internally — it stores everything as melonDS save state files named with a UUID (e.g. <code>24BB0163-10B6-45CD-B0B5-010EE9994B72</code>). These are identical in format to <code>.svs</code> files. This tool accepts them directly in the SVS slot — no renaming needed.</div>
+      <div class="faq-q">What are UUID files and when do I use them?</div>
+      <div class="faq-a">UUID files (e.g. <code>24BB0163-10B6-45CD-B0B5-010EE9994B72</code>, no extension) are Delta's internal saves, stored in <code>Files app → Delta → Database → SaveStates</code>. They are identical in format to <code>.svs</code> files. Use these when you need the <strong>full round-trip</strong>: extract the <code>.sav</code>, edit it, inject it back, and replace the UUID file in Delta's folder. This is the only reliable way to get an updated save back into Delta.</div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-q">Delta's "Import Save State" button doesn't work — what do I do?</div>
-      <div class="faq-a">Use the manual method instead — it's more reliable. Open the <strong>Files app</strong> on iOS → navigate to <code>Delta → Database → SaveStates</code> → find the original UUID save file for your game → replace it with the converted <code>.svs</code> file, renaming it to match the original UUID exactly. Delta will pick it up automatically the next time you load the game.</div>
+      <div class="faq-q">Why can't I just use the .svs to reimport into Delta?</div>
+      <div class="faq-a">Delta's built-in "Import Save State" function doesn't work reliably. The only method that consistently works is manually replacing the UUID file in <code>Files app → Delta → Database → SaveStates</code> with the updated file, keeping the exact same UUID filename.</div>
     </div>
 
     <div class="faq-item">
@@ -675,12 +678,19 @@ body {
 
     <div class="faq-item">
       <div class="faq-q">How do I trade Pokémon with myself using this tool?</div>
-      <div class="faq-a">Export your <code>.svs</code> from Delta → extract the <code>.sav</code> here → load it in melonDS → open two instances of melonDS and trade → save the game → inject the updated <code>.sav</code> back into the <code>.svs</code> → import into Delta.</div>
+      <div class="faq-a">
+        1. Find your UUID save file in <code>Files app → Delta → Database → SaveStates</code> and copy it to your PC.<br>
+        2. Drop it in the <strong>DELTA → SAV</strong> tab → download the <code>.sav</code>.<br>
+        3. Place it next to your ROM in melonDS (same filename, <code>.sav</code> extension).<br>
+        4. Open melonDS twice, trade with yourself, save in-game.<br>
+        5. Drop the UUID file + updated <code>.sav</code> in the <strong>SAV → DELTA</strong> tab → download.<br>
+        6. Replace the original UUID file in <code>Delta → Database → SaveStates</code> with the downloaded file, keeping the exact UUID filename.
+      </div>
     </div>
 
     <div class="faq-item">
       <div class="faq-q">Can I use this with PKHeX?</div>
-      <div class="faq-a">Yes. Extract the <code>.sav</code>, open it in PKHeX to edit your Pokémon, save it, then inject it back into the <code>.svs</code> to return it to Delta.</div>
+      <div class="faq-a">Yes. Extract the <code>.sav</code> from your UUID file, open it in PKHeX to edit your Pokémon, save it, then inject it back using the <strong>SAV → DELTA</strong> tab and replace the UUID file.</div>
     </div>
   </section>
 

@@ -1,24 +1,31 @@
-# SVS ↔ SAV — DS Save Converter for Delta & melonDS
+# Delta ↔ SAV — DS Save Converter for Delta & melonDS
 
 Transfer Nintendo DS game saves between **Delta (iOS)** and **melonDS / PKHeX** — instantly, in your browser, with no file uploads.
 
-🔗 **[Try it live →](https://lautixhx.github.io/svs-sav-converter)**
+🔗 **[Try it live →](https://lautixhx.github.io/svs-sav-converter/)**
 
 ---
 
 ## The problem this solves
 
-Delta on iOS saves DS games as **`.svs` files** — full emulator snapshots (~19 MB) that include CPU state, RAM, video buffers, and the actual game save buried inside.
+Delta on iOS and melonDS on PC use incompatible save formats. This tool converts between them.
 
-melonDS on PC and tools like PKHeX expect a plain **`.sav` file** — just the raw game SRAM (usually 512 KB).
+Delta gives you two types of files — and they behave differently:
 
-These formats are incompatible. Renaming `.svs` to `.sav` doesn't work. This tool extracts or injects the save data correctly.
+| File | How to get it | What it's good for |
+|------|--------------|-------------------|
+| `.svs` | Long-press game → Export Save State | **Extraction only** (DELTA → SAV). Cannot be reliably reimported into Delta. |
+| UUID file (no extension) | `Files app → Delta → Database → SaveStates` | **Full round-trip**. Extract the `.sav`, edit it, inject it back, replace the file in Delta's folder. |
 
-### About Delta's internal save files (UUID files)
+### Why can't I just rename `.svs` to `.sav`?
 
-Delta doesn't distinguish between "save states" and "save data" internally — **it stores everything as melonDS save state files**. When you save inside a game (not a manual save state), Delta writes the result to a file named with a UUID like `24BB0163-10B6-45CD-B0B5-010EE9994B72` — no extension, but identical format to a `.svs`.
+The `.svs` file is a full emulator snapshot (~19 MB) — it contains CPU state, RAM, video buffers, and the actual save data buried inside. melonDS expects a raw `.sav` file which is just the game's SRAM (usually 512 KB). This tool extracts or injects that inner data.
 
-You can find these files via the **Files app** on iOS (Delta's folder) or by connecting your iPhone to a Mac with a cable. This tool accepts them directly — no renaming needed. Just drop the UUID file into the SVS slot and it will work exactly the same.
+### About Delta's UUID files
+
+Delta stores all saves internally as melonDS save state files named with a UUID like `24BB0163-10B6-45CD-B0B5-010EE9994B72` — no extension. These are identical in format to `.svs` files. The UUID file is the one you need for the full round-trip because it's the file you can physically replace in Delta's folder.
+
+> ⚠️ Delta's built-in "Import Save State" function does not work reliably. The only method that consistently works is manually replacing the UUID file.
 
 ---
 
@@ -73,28 +80,26 @@ The rest of the save state (CPU registers, screen state, etc.) is kept intact, s
 
 ### How to trade-evolve a Pokémon (e.g. Gengar, Alakazam)
 
-1. In **Delta**, long-press the game → **Export Save State** → save the `.svs` file
-   - Or locate the UUID save file in `Files app → Delta → Database → SaveStates`
-2. Drop the file into the **SVS → SAV** tab → download the `.sav`
-3. Place the `.sav` next to your ROM in melonDS, with the same filename
+1. On your iPhone, open **Files app** → `Delta → Database → SaveStates`
+2. Find the UUID file for your game and copy it to your PC
+3. Drop it into the **DELTA → SAV** tab → download the `.sav`
+4. Place the `.sav` next to your ROM in melonDS with the same filename
    - Example: `Pokemon Platinum.nds` + `Pokemon Platinum.sav`
-4. Open melonDS **twice** (two windows) — load the ROM in both
-5. Use the in-game Union Room / Wi-Fi Club to trade between the two instances
-6. Save both games in-game
-7. Drop the updated `.sav` + the original file into the **SAV → SVS** tab → download
-8. **To import back into Delta:**
-   - Open the **Files app** on iOS → `Delta → Database → SaveStates`
-   - Replace the original UUID file with the downloaded file, keeping the exact UUID filename
-   - Open Delta — your Pokémon will be evolved and ready
+5. Open melonDS **twice** (two windows) — load the ROM in both
+6. Use the in-game Union Room / Wi-Fi Club to trade between the two instances
+7. **Save the game in-game** (not via the emulator's save state function)
+8. Drop the UUID file + the updated `.sav` into the **SAV → DELTA** tab → download
+9. Replace the original UUID file in `Files app → Delta → Database → SaveStates` with the downloaded file — keeping the **exact same UUID filename** (no extension)
+10. Open Delta — your Pokémon will be evolved and ready
 
 ### How to edit your save with PKHeX
 
-1. Extract the `.sav` as above
-2. Open **PKHeX** → File → Open → select the `.sav`
-3. Edit your Pokémon, items, etc.
-4. File → Save → overwrite the `.sav`
-5. Inject it back into the `.svs` using the **SAV → SVS** tab
-6. Import into Delta
+1. Copy the UUID file from `Files app → Delta → Database → SaveStates` to your PC
+2. Drop it into the **DELTA → SAV** tab → download the `.sav`
+3. Open **PKHeX** → File → Open → select the `.sav`
+4. Edit your Pokémon, items, etc. → File → Save
+5. Drop the UUID file + edited `.sav` into the **SAV → DELTA** tab → download
+6. Replace the UUID file in Delta's folder with the downloaded file, keeping the exact same filename
 
 ### How to work with Delta's internal UUID save files
 
@@ -108,21 +113,13 @@ When you save normally inside a game in Delta (not a manual save state), Delta s
 4. Edit with melonDS or PKHeX
 5. Drop the UUID file + the updated `.sav` into the **SAV → SVS** tab → download
 
-**To import the result back into Delta:**
+### How to import a `.sav` directly into Delta (no UUID file needed)
 
-> ⚠️ Delta's built-in "Import Save State" button may not work reliably. Use the manual method below instead.
-
-1. Open the **Files app** on iOS
-2. Navigate to `Delta → Database → SaveStates`
-3. Find the original UUID file for your game
-4. Replace it with the downloaded file — renaming it to match the original UUID exactly (no extension)
-5. Open Delta — the game will load with the updated save
-
-### How to import a `.sav` directly into Delta (no save state needed)
-
-If you only have a `.sav` and no original `.svs` or UUID file:
+If you only have a `.sav` and no UUID file, you can try importing it directly:
 
 In Delta → long-press the game → **Import Save Data** → select the `.sav`
+
+Note: this method may not work reliably. If it doesn't, you'll need the UUID file method above.
 
 ---
 
