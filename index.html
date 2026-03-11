@@ -530,9 +530,10 @@ body {
   <!-- ═══ EXPLAINER ═══ -->
   <section class="explainer" aria-label="What this tool does">
     <strong>What does this do?</strong><br>
-    Delta on iOS saves your DS games as <span class="tag">.svs</span> savestate files.
+    Delta on iOS saves your DS games as <span class="tag">.svs</span> savestate files — or as <span class="tag">UUID files</span> with no extension for regular in-game saves.
     melonDS on PC uses plain <span class="tag pink">.sav</span> files.
     These formats are incompatible — this tool converts between them instantly, with no data sent to any server.<br><br>
+    <strong>⚠️ Did Delta give you a file with no extension?</strong> That's normal — Delta stores all saves internally as UUID-named files (e.g. <code style="color:var(--cyan);background:rgba(0,229,255,0.08);padding:1px 5px;border-radius:2px">24BB0163-10B6-45CD-B0B5-010EE9994B72</code>). This tool accepts them directly — just drop them in the SVS slot.<br><br>
     <strong>Common use cases:</strong>
     <div class="use-cases">
       <div class="use-case">
@@ -601,8 +602,8 @@ body {
         <div class="drop-zone" id="dz-svs">
           <input type="file" id="input-svs" accept=".svs">
           <span class="drop-icon">◈</span>
-          <div class="drop-title">Original .svs</div>
-          <div class="drop-hint">Savestate from <span class="ext">Delta</span></div>
+          <div class="drop-title">Original .svs or UUID file</div>
+          <div class="drop-hint">Save state or internal save from <span class="ext">Delta</span></div>
           <div class="drop-filename" id="name-svs"></div>
         </div>
 
@@ -626,9 +627,13 @@ body {
       <button class="btn btn-download" id="dl-inject">⬇ DOWNLOAD .SVS FOR DELTA</button>
 
       <div class="instructions" id="instr-inject">
-        <strong>How to import into Delta</strong>
-        In Delta: long-press the game → <code>Import Save State</code> → select the <code>.svs</code>.<br>
-        Your updated save will be ready to load.
+        <strong>How to import back into Delta</strong>
+        Delta's built-in import function may not work reliably. The method that works:<br><br>
+        1. Open the <strong>Files app</strong> on iOS<br>
+        2. Navigate to <code>Delta → Database → SaveStates</code><br>
+        3. Find the original save file (UUID filename, no extension)<br>
+        4. Replace it with the downloaded file — keeping the <strong>exact same UUID filename</strong><br><br>
+        The next time you load the game in Delta, it will use the updated save.
       </div>
     </div>
 
@@ -641,6 +646,16 @@ body {
     <div class="faq-item">
       <div class="faq-q">What is a .svs file?</div>
       <div class="faq-a">A <code>.svs</code> file is a save state created by the Delta emulator on iOS for Nintendo DS games. It uses the melonDS save state format internally and contains a full snapshot of the game, including the SRAM save data.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">What are those files with no extension in Delta's folder (UUID files)?</div>
+      <div class="faq-a">Delta doesn't distinguish between save states and regular in-game saves internally — it stores everything as melonDS save state files named with a UUID (e.g. <code>24BB0163-10B6-45CD-B0B5-010EE9994B72</code>). These are identical in format to <code>.svs</code> files. This tool accepts them directly in the SVS slot — no renaming needed.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Delta's "Import Save State" button doesn't work — what do I do?</div>
+      <div class="faq-a">Use the manual method instead — it's more reliable. Open the <strong>Files app</strong> on iOS → navigate to <code>Delta → Database → SaveStates</code> → find the original UUID save file for your game → replace it with the converted <code>.svs</code> file, renaming it to match the original UUID exactly. Delta will pick it up automatically the next time you load the game.</div>
     </div>
 
     <div class="faq-item">
