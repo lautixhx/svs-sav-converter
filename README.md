@@ -2,7 +2,7 @@
 
 Transfer Nintendo DS game saves between **Delta (iOS)** and **melonDS / PKHeX** — instantly, in your browser, with no file uploads.
 
-🔗 **[Try it live →](https://yourusername.github.io/svs-sav-converter)**
+🔗 **[Try it live →](https://lautixhx.github.io/svs-sav-converter)**
 
 ---
 
