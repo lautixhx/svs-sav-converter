@@ -119,7 +119,7 @@ Everything runs locally in your browser using the JavaScript [File API](https://
 It's a single HTML file with no dependencies or build steps.
 
 ```bash
-git clone https://github.com/yourusername/svs-sav-converter
+git clone https://github.com/lautixhx/svs-sav-converter
 cd svs-sav-converter
 open index.html   # or just double-click it
 ```
