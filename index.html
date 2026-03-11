@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ═══ SEO ═══ -->
+<title>Delta SVS ↔ SAV Converter — Transfer DS Saves Between Delta iOS and melonDS</title>
+<meta name="description" content="Free tool to convert Delta emulator save states (.svs) to melonDS save files (.sav) and back. Transfer your Nintendo DS Pokémon saves between iPhone and PC instantly. No upload needed — runs entirely in your browser.">
+<meta name="keywords" content="Delta emulator SVS to SAV, melonDS save converter, Delta iOS save transfer, DS save file converter, Pokemon save transfer Delta melonDS, SVS SAV converter, Delta save state extract, melonDS import save, Nintendo DS save file iOS PC">
+
+<!-- Open Graph (Reddit, Discord, Twitter previews) -->
+<meta property="og:title" content="Delta SVS ↔ SAV Converter">
+<meta property="og:description" content="Transfer Nintendo DS saves between Delta (iOS) and melonDS (PC). Free, instant, runs in your browser — no upload needed.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Delta SVS ↔ SAV Converter">
+<meta name="twitter:description" content="Transfer Nintendo DS saves between Delta (iOS) and melonDS (PC). Free, instant, runs in your browser.">
+
+<!-- Structured data for Google -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Delta SVS ↔ SAV Converter",
+  "description": "Convert Delta emulator save states (.svs) to melonDS save files (.sav) and back. Transfer Nintendo DS game saves between iPhone and PC.",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0" }
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Inconsolata:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:       #080c14;
+  --surface:  #0d1120;
+  --panel:    #111827;
+  --border:   #1f2d45;
+  --border2:  #2a3d5a;
+  --cyan:     #00e5ff;
+  --green:    #00ff88;
+  --pink:     #ff4081;
+  --yellow:   #ffd600;
+  --text:     #c8d8f0;
+  --muted:    #4a6080;
+  --muted2:   #2a3d55;
+  --scanline: rgba(0,229,255,0.018);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inconsolata', monospace;
+  min-height: 100vh;
+  background-image:
+    repeating-linear-gradient(0deg, var(--scanline) 0, var(--scanline) 1px, transparent 1px, transparent 4px),
+    radial-gradient(ellipse 100% 60% at 50% -10%, rgba(0,229,255,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 110%, rgba(255,64,129,0.04) 0%, transparent 60%);
+}
+
+/* ── Layout ── */
+.page {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 48px 20px 80px;
+}
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  margin-bottom: 48px;
+  animation: fadeDown .7s ease both;
+}
+
+.hero-badge {
+  display: inline-block;
+  font-family: 'VT323', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  border: 1px solid rgba(0,229,255,0.25);
+  padding: 3px 14px;
+  border-radius: 2px;
+  margin-bottom: 20px;
+  background: rgba(0,229,255,0.04);
+  text-transform: uppercase;
+}
+
+.hero-logo {
+  font-family: 'VT323', monospace;
+  font-size: clamp(48px, 10vw, 72px);
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: 6px;
+  text-shadow: 0 0 40px rgba(0,229,255,0.3);
+}
+
+.hero-logo span { color: var(--cyan); }
+
+.hero-tagline {
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-weight: 600;
+  letter-spacing: .5px;
+}
+
+.hero-sub {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  line-height: 1.7;
+}
+
+/* ── Explainer ── */
+.explainer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--cyan);
+  border-radius: 2px;
+  padding: 20px 22px;
+  margin-bottom: 32px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text);
+  animation: fadeUp .7s ease .1s both;
+}
+
+.explainer strong { color: var(--cyan); }
+.explainer .tag {
+  display: inline-block;
+  background: rgba(0,229,255,0.1);
+  color: var(--cyan);
+  padding: 0 6px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.explainer .tag.pink {
+  background: rgba(255,64,129,0.1);
+  color: var(--pink);
+}
+
+/* Use cases */
+.use-cases {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.use-case {
+  background: rgba(0,229,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 12px 14px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.use-case strong {
+  display: block;
+  color: var(--text);
+  margin-bottom: 2px;
+  font-size: 12px;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 2px 2px 0 0;
+  overflow: hidden;
+  animation: fadeUp .7s ease .15s both;
+}
+
+.tab-btn {
+  padding: 14px;
+  background: var(--surface);
+  border: none;
+  color: var(--muted);
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--cyan);
+  transform: scaleX(0);
+  transition: transform .2s;
+}
+
+.tab-btn.active {
+  background: var(--panel);
+  color: #fff;
+}
+
+.tab-btn.active::after { transform: scaleX(1); }
+.tab-btn:hover:not(.active) { background: rgba(0,229,255,0.03); color: var(--text); }
+
+/* ── Panel ── */
+.tool-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 2px 2px;
+  padding: 28px;
+  animation: fadeUp .7s ease .2s both;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ── Drop zone ── */
+.drop-zone {
+  border: 1px dashed var(--border2);
+  border-radius: 2px;
+  padding: 36px 20px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  transition: border-color .2s, background .2s;
+  background: rgba(0,229,255,0.015);
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0,229,255,0.06) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+}
+
+.drop-zone:hover, .drop-zone.drag-over {
+  border-color: var(--cyan);
+  background: rgba(0,229,255,0.04);
+}
+
+.drop-zone:hover::before, .drop-zone.drag-over::before { opacity: 1; }
+
+.drop-zone input[type=file] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.drop-zone.loaded {
+  border-color: var(--green);
+  border-style: solid;
+  background: rgba(0,255,136,0.03);
+}
+
+.drop-icon {
+  font-family: 'VT323', monospace;
+  font-size: 42px;
+  color: var(--cyan);
+  line-height: 1;
+  margin-bottom: 10px;
+  display: block;
+  transition: transform .3s;
+  text-shadow: 0 0 16px rgba(0,229,255,0.35);
+}
+
+.drop-zone.loaded .drop-icon { color: var(--green); text-shadow: 0 0 16px rgba(0,255,136,0.35); }
+.drop-zone:hover .drop-icon { transform: scale(1.08); }
+
+.drop-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.drop-hint  { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+.drop-hint .ext { color: var(--pink); font-weight: 700; }
+.drop-filename {
+  font-size: 11px; color: var(--green); margin-top: 8px;
+  word-break: break-all; display: none;
+}
+.drop-zone.loaded .drop-filename { display: block; }
+
+/* Two-slot grid */
+.slot-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.slot-arrow {
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  color: var(--muted);
+  text-align: center;
+  padding-bottom: 24px;
+}
+
+/* ── Log ── */
+.log {
+  background: #050810;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 13px 15px 13px 60px;
+  font-size: 12px;
+  line-height: 1.9;
+  display: none;
+  position: relative;
+  margin-top: 16px;
+}
+
+.log::before {
+  content: 'LOG >';
+  position: absolute;
+  top: 13px; left: 15px;
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.log-line { display: block; }
+.log-line.ok    { color: var(--green); }
+.log-line.err   { color: var(--pink); }
+.log-line.info  { color: var(--cyan); }
+.log-line.warn  { color: var(--yellow); }
+.log-line.muted { color: var(--muted); }
+
+/* ── Result ── */
+.result {
+  margin-top: 14px;
+  background: rgba(0,255,136,0.04);
+  border: 1px solid rgba(0,255,136,0.18);
+  border-radius: 2px;
+  padding: 14px 16px;
+  display: none;
+}
+
+.result-row { display: flex; justify-content: space-between; font-size: 12px; padding: 2px 0; }
+.result-label { color: var(--muted); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+.result-value { color: var(--green); font-weight: 600; }
+.result-divider { border: none; border-top: 1px solid rgba(0,255,136,0.1); margin: 7px 0; }
+
+/* ── Buttons ── */
+.btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 13px;
+  font-family: 'VT323', monospace;
+  font-size: 19px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  text-transform: uppercase;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  transition: color .15s, box-shadow .15s;
+  display: block;
+}
+
+.btn-primary {
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--cyan);
+  transform: translateX(-100%);
+  transition: transform .22s ease;
+  z-index: 0;
+}
+
+.btn-primary:hover::before { transform: translateX(0); }
+.btn-primary:hover { color: #000; box-shadow: 0 0 24px rgba(0,229,255,0.25); }
+.btn-primary:disabled { opacity: .3; cursor: not-allowed; }
+.btn-primary:disabled::before { display: none; }
+.btn-primary span { position: relative; z-index: 1; }
+
+.btn-download {
+  background: var(--green);
+  border: none;
+  color: #000;
+  font-weight: 700;
+  display: none;
+}
+
+.btn-download:hover { box-shadow: 0 0 28px rgba(0,255,136,0.4); transform: translateY(-1px); }
+.btn-download:active { transform: translateY(0); }
+
+/* ── Instructions ── */
+.instructions {
+  margin-top: 18px;
+  padding: 13px 16px;
+  border-left: 2px solid var(--border2);
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.9;
+  display: none;
+}
+
+.instructions strong {
+  color: var(--yellow);
+  display: block;
+  margin-bottom: 4px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.instructions code {
+  color: var(--cyan);
+  background: rgba(0,229,255,0.08);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+/* ── FAQ / SEO content ── */
+.faq {
+  margin-top: 48px;
+  animation: fadeUp .7s ease .3s both;
+}
+
+.faq-title {
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.faq-item {
+  border-top: 1px solid var(--border);
+  padding: 16px 0;
+}
+
+.faq-item:last-child { border-bottom: 1px solid var(--border); }
+
+.faq-q {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.faq-a {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.faq-a code {
+  color: var(--cyan);
+  background: rgba(0,229,255,0.08);
+  padding: 0 4px;
+  border-radius: 2px;
+}
+
+/* ── Footer ── */
+.footer {
+  margin-top: 48px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--muted2);
+  letter-spacing: 1px;
+  line-height: 1.8;
+  animation: fadeUp .7s ease .4s both;
+}
+
+/* ── Animations ── */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes glow {
+  0%,100% { text-shadow: 0 0 30px rgba(0,229,255,0.3); }
+  50%      { text-shadow: 0 0 50px rgba(0,229,255,0.6), 0 0 100px rgba(0,229,255,0.2); }
+}
+
+.hero-logo { animation: glow 4s ease-in-out infinite; }
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .use-cases { grid-template-columns: 1fr; }
+  .slot-grid { grid-template-columns: 1fr; }
+  .slot-arrow { display: none; }
+  .tab-btn { font-size: 14px; letter-spacing: 1px; padding: 12px 8px; }
+}
+</style>
+</head>
+
+<body>
+<div class="page">
+
+  <!-- ═══ HERO ═══ -->
+  <header class="hero">
+    <div class="hero-badge">Nintendo DS · Delta iOS · melonDS PC</div>
+    <div class="hero-logo">SVS<span>↔</span>SAV</div>
+    <p class="hero-tagline">Transfer DS game saves between Delta (iPhone) and melonDS (PC)</p>
+    <p class="hero-sub">Free · Instant · No upload — everything runs in your browser</p>
+  </header>
+
+  <!-- ═══ EXPLAINER ═══ -->
+  <section class="explainer" aria-label="What this tool does">
+    <strong>What does this do?</strong><br>
+    Delta on iOS saves your DS games as <span class="tag">.svs</span> savestate files.
+    melonDS on PC uses plain <span class="tag pink">.sav</span> files.
+    These formats are incompatible — this tool converts between them instantly, with no data sent to any server.<br><br>
+    <strong>Common use cases:</strong>
+    <div class="use-cases">
+      <div class="use-case">
+        <strong>🔁 Trade evolutions</strong>
+        Transfer your save to PC, trade with yourself in melonDS, then send it back to Delta.
+      </div>
+      <div class="use-case">
+        <strong>✏️ Save editing</strong>
+        Extract your save, edit it with PKHeX or another tool, then re-import to Delta.
+      </div>
+      <div class="use-case">
+        <strong>💾 Backup</strong>
+        Export your Delta save as a standard .sav file to keep a portable backup.
+      </div>
+      <div class="use-case">
+        <strong>📲 Cross-platform play</strong>
+        Continue your game on PC and come back to your phone with the updated save.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TABS ═══ -->
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" id="tab-extract" role="tab" aria-selected="true" aria-controls="panel-extract">
+      SVS → SAV
+    </button>
+    <button class="tab-btn" id="tab-inject" role="tab" aria-selected="false" aria-controls="panel-inject">
+      SAV → SVS
+    </button>
+  </div>
+
+  <div class="tool-panel">
+
+    <!-- ══ TAB 1: EXTRACT ══ -->
+    <div class="tab-content active" id="panel-extract" role="tabpanel">
+
+      <div class="drop-zone" id="dz-extract">
+        <input type="file" id="input-extract" accept=".svs">
+        <span class="drop-icon">◈</span>
+        <div class="drop-title">Drop your .svs file here</div>
+        <div class="drop-hint">Delta save state — <span class="ext">.svs</span> or any UUID file</div>
+        <div class="drop-filename" id="name-extract"></div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-extract" disabled>
+        <span>⬇ EXTRACT .SAV FROM SAVESTATE</span>
+      </button>
+
+      <div class="log" id="log-extract"><div class="log-lines" id="lines-extract"></div></div>
+      <div class="result" id="result-extract"></div>
+      <button class="btn btn-download" id="dl-extract">⬇ DOWNLOAD .SAV FOR MELONDS / PKHEX</button>
+
+      <div class="instructions" id="instr-extract">
+        <strong>How to use in melonDS</strong>
+        Place the <code>.sav</code> in the same folder as your ROM with the same name.<br>
+        Example: <code>Pokemon Platinum.nds</code> → <code>Pokemon Platinum.sav</code><br><br>
+        <strong>How to use in PKHeX</strong>
+        Open PKHeX → File → Open → select the <code>.sav</code> file.
+      </div>
+    </div>
+
+    <!-- ══ TAB 2: INJECT ══ -->
+    <div class="tab-content" id="panel-inject" role="tabpanel">
+
+      <div class="slot-grid">
+        <div class="drop-zone" id="dz-svs">
+          <input type="file" id="input-svs" accept=".svs">
+          <span class="drop-icon">◈</span>
+          <div class="drop-title">Original .svs</div>
+          <div class="drop-hint">Savestate from <span class="ext">Delta</span></div>
+          <div class="drop-filename" id="name-svs"></div>
+        </div>
+
+        <div class="slot-arrow">→</div>
+
+        <div class="drop-zone" id="dz-sav">
+          <input type="file" id="input-sav" accept=".sav">
+          <span class="drop-icon">◇</span>
+          <div class="drop-title">Edited .sav</div>
+          <div class="drop-hint">From <span class="ext">melonDS</span> or PKHeX</div>
+          <div class="drop-filename" id="name-sav"></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-inject" disabled>
+        <span>⚙ INJECT SAV INTO SAVESTATE</span>
+      </button>
+
+      <div class="log" id="log-inject"><div class="log-lines" id="lines-inject"></div></div>
+      <div class="result" id="result-inject"></div>
+      <button class="btn btn-download" id="dl-inject">⬇ DOWNLOAD .SVS FOR DELTA</button>
+
+      <div class="instructions" id="instr-inject">
+        <strong>How to import into Delta</strong>
+        In Delta: long-press the game → <code>Import Save State</code> → select the <code>.svs</code>.<br>
+        Your updated save will be ready to load.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ FAQ (SEO content) ═══ -->
+  <section class="faq" aria-label="Frequently asked questions">
+    <div class="faq-title">// FAQ</div>
+
+    <div class="faq-item">
+      <div class="faq-q">What is a .svs file?</div>
+      <div class="faq-a">A <code>.svs</code> file is a save state created by the Delta emulator on iOS for Nintendo DS games. It uses the melonDS save state format internally and contains a full snapshot of the game, including the SRAM save data.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Why can't I just rename .svs to .sav?</div>
+      <div class="faq-a">The <code>.svs</code> file is a full emulator snapshot (~19 MB) — it contains CPU state, RAM, video, and the actual save data buried inside. melonDS expects a raw <code>.sav</code> file which is just the game's SRAM (usually 512 KB). This tool extracts or injects that inner data.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Which games are supported?</div>
+      <div class="faq-a">Any Nintendo DS game that runs on Delta and melonDS — including Pokémon Diamond, Pearl, Platinum, HeartGold, SoulSilver, Black, White, and many others. The tool auto-detects SRAM size (32 KB, 64 KB, 128 KB, 256 KB or 512 KB).</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Is my save file uploaded anywhere?</div>
+      <div class="faq-a">No. Everything runs locally in your browser using the JavaScript File API. Your save data never leaves your device.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">How do I trade Pokémon with myself using this tool?</div>
+      <div class="faq-a">Export your <code>.svs</code> from Delta → extract the <code>.sav</code> here → load it in melonDS → open two instances of melonDS and trade → save the game → inject the updated <code>.sav</code> back into the <code>.svs</code> → import into Delta.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Can I use this with PKHeX?</div>
+      <div class="faq-a">Yes. Extract the <code>.sav</code>, open it in PKHeX to edit your Pokémon, save it, then inject it back into the <code>.svs</code> to return it to Delta.</div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    ALL PROCESSING IS LOCAL · NO DATA IS EVER UPLOADED<br>
+    Works with Delta (iOS) · melonDS · PKHeX · any standard DS save tool
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+// ════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════
+function readU32LE(d, o) {
+  return (d[o] | d[o+1]<<8 | d[o+2]<<16 | d[o+3]<<24) >>> 0;
+}
+
+function makeLogger(linesEl, logEl) {
+  return function log(msg, type = 'info') {
+    logEl.style.display = 'block';
+    const line = document.createElement('span');
+    line.className = 'log-line ' + type;
+    const pfx = { ok:'✓ ', err:'✗ ', info:'» ', warn:'⚠ ', muted:'  ' };
+    line.textContent = (pfx[type] || '') + msg;
+    linesEl.appendChild(line);
+  };
+}
+
+function showResult(el, rows) {
+  el.innerHTML = rows.map(([l,v]) =>
+    `<div class="result-row"><span class="result-label">${l}</span><span class="result-value">${v}</span></div>`
+  ).join('<hr class="result-divider">');
+  el.style.display = 'block';
+}
+
+function setupDrop(zone, input, onFile) {
+  input.addEventListener('change', e => { if (e.target.files[0]) onFile(e.target.files[0]); });
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]);
+  });
+}
+
+function readFile(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = e => res(new Uint8Array(e.target.result));
+    r.onerror = rej;
+    r.readAsArrayBuffer(file);
+  });
+}
+
+function findSRAM(data) {
+  // 1. Find NDSC section
+  let ndscOffset = -1;
+  for (let i = 0; i < data.length - 8; i++) {
+    if (data[i]===0x4E && data[i+1]===0x44 && data[i+2]===0x53 && data[i+3]===0x43) {
+      const sl = readU32LE(data, i+4);
+      if (sl > 0 && sl < 500000) { ndscOffset = i; break; }
+    }
+  }
+  if (ndscOffset < 0) return null;
+
+  const ndscLen = readU32LE(data, ndscOffset+4);
+  const ndscEnd = ndscOffset + 8 + ndscLen;
+
+  // 2. Detect SRAM size and header offset
+  const SIZES = [524288, 262144, 131072, 65536, 32768];
+  let sramSize = 0, headerSize = 0;
+
+  if (ndscEnd + 24 < data.length) {
+    const s = readU32LE(data, ndscEnd+12);
+    if (SIZES.includes(s)) { sramSize = s; headerSize = 0x18; }
+  }
+  if (!sramSize && ndscEnd + 16 < data.length) {
+    const s = readU32LE(data, ndscEnd+8);
+    if (SIZES.includes(s)) { sramSize = s; headerSize = 0x10; }
+  }
+  if (!sramSize) {
+    for (const hdr of [0x18, 0x20, 0x10, 0x08, 0x00]) {
+      const te = ndscEnd + hdr + 524288;
+      if (te > data.length) continue;
+      const sl = data.slice(te - 131072, te);
+      let ff = 0; for (let i=0;i<sl.length;i++) if (sl[i]===0xFF) ff++;
+      if (ff > 65536) { sramSize = 524288; headerSize = hdr; break; }
+    }
+  }
+
+  if (!sramSize) return null;
+
+  const sramStart = ndscEnd + headerSize;
+  const sramEnd   = sramStart + sramSize;
+  if (sramEnd > data.length) return null;
+
+  return { sramStart, sramEnd, sramSize, ndscEnd, headerSize };
+}
+
+// ════════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════════
+document.getElementById('tab-extract').addEventListener('click', () => switchTab('extract'));
+document.getElementById('tab-inject').addEventListener('click',  () => switchTab('inject'));
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.id === 'tab-' + name);
+    b.setAttribute('aria-selected', b.id === 'tab-' + name);
+  });
+  document.querySelectorAll('.tab-content').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel-' + name);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// TAB 1 — EXTRACT (SVS → SAV)
+// ════════════════════════════════════════════════════════
+const dzExtract   = document.getElementById('dz-extract');
+const inExtract   = document.getElementById('input-extract');
+const nameExtract = document.getElementById('name-extract');
+const btnExtract  = document.getElementById('btn-extract');
+const logExtract  = document.getElementById('log-extract');
+const linesExtract= document.getElementById('lines-extract');
+const resultExtract= document.getElementById('result-extract');
+const dlExtract   = document.getElementById('dl-extract');
+const instrExtract= document.getElementById('instr-extract');
+const logE = makeLogger(linesExtract, logExtract);
+
+let extractBlob = null;
+let extractName = '';
+let extractFile = null;
+
+setupDrop(dzExtract, inExtract, file => {
+  extractFile = file;
+  extractName = file.name.replace(/\.\w+$/, '');
+  nameExtract.textContent = file.name;
+  dzExtract.classList.add('loaded');
+  btnExtract.disabled = false;
+  // reset output
+  linesExtract.innerHTML = '';
+  logExtract.style.display = 'none';
+  resultExtract.style.display = 'none';
+  dlExtract.style.display = 'none';
+  instrExtract.style.display = 'none';
+  extractBlob = null;
+});
+
+btnExtract.addEventListener('click', async () => {
+  linesExtract.innerHTML = '';
+  logExtract.style.display = 'none';
+  resultExtract.style.display = 'none';
+  dlExtract.style.display = 'none';
+  instrExtract.style.display = 'none';
+  extractBlob = null;
+
+  const data = await readFile(extractFile);
+  logE(`File: ${extractFile.name} (${(extractFile.size/1024/1024).toFixed(2)} MB)`, 'muted');
+
+  const magic = String.fromCharCode(data[0],data[1],data[2],data[3]);
+  if (magic !== 'MELN') {
+    logE('Not a valid melonDS save state (bad magic)', 'err');
+    return;
+  }
+  logE(`melonDS save state v${readU32LE(data,4)} detected`, 'ok');
+  logE('Locating NDSC section...', 'info');
+
+  const found = findSRAM(data);
+  if (!found) {
+    logE('Could not locate SRAM in this save state', 'err');
+    return;
+  }
+
+  const { sramStart, sramEnd, sramSize } = found;
+  logE(`SRAM found at offset ${sramStart} (${sramSize/1024} KB)`, 'ok');
+
+  const sramData = data.slice(sramStart, sramEnd);
+  let ff=0, z=0;
+  for (let i=0;i<sramData.length;i++) { if(sramData[i]===0xFF) ff++; else if(sramData[i]===0) z++; }
+  const pct = ((sramSize-ff-z)/sramSize*100).toFixed(1);
+  logE(`Validation: ${pct}% data, ${(ff/sramSize*100).toFixed(1)}% erased flash`, 'ok');
+  logE(`Extraction complete: ${sramSize/1024} KB`, 'ok');
+
+  extractBlob = new Blob([sramData], { type: 'application/octet-stream' });
+
+  showResult(resultExtract, [
+    ['Source file',   extractFile.name],
+    ['Save state size', (extractFile.size/1024/1024).toFixed(2) + ' MB'],
+    ['SRAM extracted', sramSize/1024 + ' KB'],
+    ['Output file',  extractName + '.sav'],
+  ]);
+
+  dlExtract.style.display = 'block';
+  instrExtract.style.display = 'block';
+});
+
+dlExtract.addEventListener('click', () => {
+  if (!extractBlob) return;
+  const url = URL.createObjectURL(extractBlob);
+  const a = document.createElement('a');
+  a.href = url; a.download = extractName + '.sav'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+// ════════════════════════════════════════════════════════
+// TAB 2 — INJECT (SAV → SVS)
+// ════════════════════════════════════════════════════════
+const dzSvs   = document.getElementById('dz-svs');
+const inSvs   = document.getElementById('input-svs');
+const nameSvs = document.getElementById('name-svs');
+const dzSav   = document.getElementById('dz-sav');
+const inSav   = document.getElementById('input-sav');
+const nameSav = document.getElementById('name-sav');
+const btnInject  = document.getElementById('btn-inject');
+const logInject  = document.getElementById('log-inject');
+const linesInject= document.getElementById('lines-inject');
+const resultInject= document.getElementById('result-inject');
+const dlInject   = document.getElementById('dl-inject');
+const instrInject= document.getElementById('instr-inject');
+const logI = makeLogger(linesInject, logInject);
+
+let svsFile = null, savFile = null;
+let injectBlob = null;
+
+function checkInjectReady() {
+  btnInject.disabled = !(svsFile && savFile);
+}
+
+setupDrop(dzSvs, inSvs, file => {
+  const magic_check = new FileReader();
+  magic_check.onload = e => {
+    const b = new Uint8Array(e.target.result);
+    if (String.fromCharCode(b[0],b[1],b[2],b[3]) !== 'MELN') {
+      alert('This file does not appear to be a valid melonDS save state.');
+      return;
+    }
+    svsFile = file;
+    nameSvs.textContent = file.name;
+    dzSvs.classList.add('loaded');
+    checkInjectReady();
+  };
+  magic_check.readAsArrayBuffer(file.slice(0,4));
+});
+
+setupDrop(dzSav, inSav, file => {
+  savFile = file;
+  nameSav.textContent = `${file.name} (${file.size/1024} KB)`;
+  dzSav.classList.add('loaded');
+  checkInjectReady();
+});
+
+btnInject.addEventListener('click', async () => {
+  linesInject.innerHTML = '';
+  logInject.style.display = 'none';
+  resultInject.style.display = 'none';
+  dlInject.style.display = 'none';
+  instrInject.style.display = 'none';
+  injectBlob = null;
+
+  const svsData = await readFile(svsFile);
+  const savData = await readFile(savFile);
+
+  logI(`Save state: ${svsFile.name} (${(svsFile.size/1024/1024).toFixed(2)} MB)`, 'muted');
+  logI(`Save file: ${savFile.name} (${savData.length/1024} KB)`, 'muted');
+  logI(`melonDS save state v${readU32LE(svsData,4)} detected`, 'ok');
+  logI('Locating SRAM in save state...', 'info');
+
+  const found = findSRAM(svsData);
+  if (!found) {
+    logI('Could not locate SRAM in this save state', 'err');
+    return;
+  }
+
+  const { sramStart, sramEnd, sramSize } = found;
+  logI(`SRAM found at offset ${sramStart} (${sramSize/1024} KB)`, 'ok');
+
+  if (savData.length > sramSize) {
+    logI(`The .sav file (${savData.length/1024}KB) is larger than the SRAM slot (${sramSize/1024}KB) — aborting`, 'err');
+    return;
+  }
+
+  if (savData.length !== sramSize) {
+    logI(`Size mismatch: .sav is ${savData.length/1024}KB, SRAM is ${sramSize/1024}KB — remainder will be filled with 0xFF`, 'warn');
+  }
+
+  logI('Injecting save data...', 'info');
+  const output = new Uint8Array(svsData);
+  output.set(savData.slice(0, Math.min(savData.length, sramSize)), sramStart);
+  if (savData.length < sramSize) output.fill(0xFF, sramStart + savData.length, sramEnd);
+
+  injectBlob = new Blob([output], { type: 'application/octet-stream' });
+  logI(`Done — output: ${(output.length/1024/1024).toFixed(2)} MB`, 'ok');
+
+  showResult(resultInject, [
+    ['Save state',    svsFile.name],
+    ['SRAM injected', Math.min(savData.length, sramSize)/1024 + ' KB'],
+    ['Output size',   (output.length/1024/1024).toFixed(2) + ' MB'],
+    ['Output file',   svsFile.name],
+  ]);
+
+  dlInject.style.display = 'block';
+  instrInject.style.display = 'block';
+});
+
+dlInject.addEventListener('click', () => {
+  if (!injectBlob) return;
+  const url = URL.createObjectURL(injectBlob);
+  const a = document.createElement('a');
+  a.href = url; a.download = svsFile.name; a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
